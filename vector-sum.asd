@@ -8,7 +8,7 @@
   :serial t
   :components ((:file "package")
                (:file "vector-sum"))
-  :depends-on (:serapeum)
+  :depends-on (:serapeum :alexandria)
   :in-order-to ((test-op (load-op "vector-sum/tests")))
   :perform (test-op (op system)
                     (declare (ignore op system))
