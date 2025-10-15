@@ -11,3 +11,6 @@ CL-USER> (reduce #'+ *xs*)
 CL-USER> (vector-sum:sum *xs*)
 6000.0
 ```
+
+The function `sum` supports `:start`, `:end` and `:key` parameters which have
+the same meaning as in `reduce`.
