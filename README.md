@@ -14,3 +14,12 @@ CL-USER> (vector-sum:sum *xs*)
 
 The function `sum` supports `:start`, `:end` and `:key` parameters which have
 the same meaning as in `reduce`.
+
+There is also `scan` function for prefix sums:
+
+``` lisp
+CL-USER> (defparameter *xs* (make-array 4 :element-type 'single-float :initial-contents '(1.0 2.0 3.0 4.0)))
+*xs*
+CL-USER> (vector-sum:scan *xs*)
+#(1.0 3.0 6.0 10.0)
+```
