@@ -1,10 +1,15 @@
 (in-package :vector-sum/tests)
 
 (defun run-tests ()
-  (explain! (run 'vector-sum)))
+  (every #'identity
+         (mapcar (lambda (suite)
+                   (let ((status (run suite)))
+                     (explain! status)
+                     (results-status status)))
+                 '(sum scan))))
 
-(def-suite vector-sum :description "Test vector-sum")
-(in-suite vector-sum)
+(def-suite sum  :description "Test SUM")
+(def-suite scan :description "Test SCAN")
 
 (declaim (inline complex-real->double))
 (defun complex-real->double (x)
@@ -18,25 +23,48 @@
    (float (realpart x) 0f0)
    (float (imagpart x) 0f0)))
 
-(test vector-of-singles
+(in-suite sum)
+(test vector-of-singles/sum
   (loop repeat 10000
         for xs = (make-array 5000 :element-type 'single-float :initial-contents
                              (loop repeat 5000 collect (random 1.0)))
         for s1 = (vector-sum:sum xs)
-        for s2 = (float
-                  (reduce #'+ (map '(vector double-float)
-                                   (lambda (x) (float x 0d0))
-                                   xs))
-                  0f0)
+        for s2 = (float (reduce #'+ xs :key (lambda (x) (float x 0d0))) 0f0)
         do (is (= s1 s2))))
 
-(test vector-of-complex-singles
+(test vector-of-complex-singles/sum
   (loop repeat 10000
         for xs = (make-array 5000 :element-type '(complex single-float) :initial-contents
                              (loop repeat 5000 collect (complex (random 1.0) (random 1.0))))
         for s1 = (vector-sum:sum xs)
         for s2 = (complex-real->float
-                  (reduce #'+ (map '(vector (complex double-float))
-                                   #'complex-real->double
-                                   xs)))
+                  (reduce #'+ xs :key #'complex-real->double))
         do (is (= s1 s2))))
+
+(in-suite scan)
+(test vector-of-singles/scan
+  (loop repeat 10000
+        for xs = (make-array 5000 :element-type 'single-float :initial-contents
+                             (loop repeat 5000 collect (random 1.0)))
+        for s1 = (vector-sum:scan xs)
+        for s2 = (map '(vector single-float)
+                      (lambda (x) (float x 0f0))
+                      ;; This function does not use Kahan summation algo
+                      (vector-sum::scan/rational
+                       (map '(vector double-float)
+                            (lambda (x) (float x 0d0))
+                            xs)))
+        do (is (equalp s1 s2))))
+
+(test vector-of-complex-singles/scan
+  (loop repeat 10000
+        for xs = (make-array 5000 :element-type '(complex single-float) :initial-contents
+                             (loop repeat 5000 collect (complex (random 1.0) (random 1.0))))
+        for s1 = (vector-sum:scan xs)
+        for s2 = (map '(vector (complex single-float))
+                      #'complex-real->float
+                      (vector-sum::scan/rational
+                       (map '(vector (complex double-float))
+                            #'complex-real->double
+                            xs)))
+        do (is (equalp s1 s2))))

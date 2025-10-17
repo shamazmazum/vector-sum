@@ -1,4 +1,4 @@
 (defpackage vector-sum
   (:use #:cl)
-  (:export #:sum))
+  (:export #:sum #:scan))
 (in-package :vector-sum)
