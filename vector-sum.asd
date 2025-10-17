@@ -7,7 +7,7 @@
   :pathname "src"
   :serial t
   :components ((:file "package")
-               (:file "vector-sum"))
+               (:file "sum"))
   :depends-on (:serapeum :alexandria)
   :in-order-to ((test-op (load-op "vector-sum/tests")))
   :perform (test-op (op system)
