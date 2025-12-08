@@ -1,12 +1,13 @@
 (defsystem :vector-sum
   :name :vector-sum
-  :version "0.2"
+  :version "1.0"
   :author "Vasily Postnicov <shamaz.mazum@gmail.com>"
   :description "numpy.sum() for a vector"
   :licence "2-clause BSD"
   :pathname "src"
   :serial t
   :components ((:file "package")
+               (:file "sum-state")
                (:file "sum")
                (:file "scan"))
   :depends-on (:serapeum :alexandria)
@@ -20,7 +21,7 @@
 
 (defsystem :vector-sum/tests
   :name :vector-sum/tests
-  :version "0.2"
+  :version "1.0"
   :author "Vasily Postnicov <shamaz.mazum@gmail.com>"
   :licence "2-clause BSD"
   :pathname "tests"

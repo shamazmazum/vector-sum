@@ -23,3 +23,39 @@ CL-USER> (defparameter *xs* (make-array 4 :element-type 'single-float :initial-c
 CL-USER> (vector-sum:scan *xs*)
 #(1.0 3.0 6.0 10.0)
 ```
+
+## New function from version 1.0 API
+
+Now there is a generic `add` function which adds a value to a state.
+
+E.g. this way you can calculate `1f-6 * n`:
+
+``` lisp
+(serapeum:-> foo ((integer 0))
+             (values single-float &optional))
+(defun foo (n)
+  (declare (optimize (speed 3)))
+  ;; SUM-STATE is specialized over its argument which can be any
+  ;; number.
+  (let ((state (vector-sum:sum-state 0f0)))
+    (labels ((%go (state n)
+               (declare (type fixnum n))
+               (if (zerop n) state
+                   ;; ADD is specialized over the second argument. The
+                   ;; state must be "compatible" with the second
+                   ;; argument, i.e. you cannot add a single float
+                   ;; value to a double-float state.
+                   (%go (vector-sum:add state 1f-6)
+                        (1- n)))))
+      ;; STATE-SUM extracts the result from the state.
+      (vector-sum:state-sum
+       (%go state n)))))
+```
+
+The result is
+``` lisp
+CL-USER> (loop repeat 10000 sum 1f-6)
+0.009999673
+CL-USER> (foo 10000)
+0.01
+```
