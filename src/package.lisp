@@ -6,5 +6,10 @@
    ;; v1 API
    #:sum-state
    #:state-sum
-   #:add))
+   #:add
+   ;; v2 API
+   #:sum-state/single-float
+   #:sum-state/double-float
+   #:sum-state/complex-single-float
+   #:sum-state/complex-double-float))
 (in-package :vector-sum)
